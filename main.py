@@ -2,10 +2,10 @@ from bs4 import BeautifulSoup
 import requests
 from tkinter import *
 from pathlib import Path
+import os
 
 """A GUI application that creates a list of the top 100 movies scraped from Empire Online and allows the user to delete
 them individually until they have marked off all movies."""
-
 
 # Colors
 DARK = "#222831"
@@ -17,6 +17,7 @@ WHITE = "#EEEEEE"
 class MovieList:
     """A class to handle all the movies and GUI"""
     def __init__(self):
+        """Create window, header, and reset button."""
         self.list = []
         self.movie_objects = []
         self.button_objects = []
@@ -29,6 +30,13 @@ class MovieList:
 
         self.header = Label(text=f"Movies to Watch: {len(self.list)}", bg=MID, font=("arial", 20, "bold"), fg=BLUE)
         self.header.grid(column=0, row=0, padx=5, pady=15, columnspan=12)
+        reset = Button(text="Reset List", fg=BLUE, bg=DARK, font=("georgia", 12, "bold"), command=self.reset)
+        reset.grid(column=13, row=0)
+        self.get_movies()
+
+    def reset(self):
+        """Removes movie file to restart list."""
+        os.remove("movies.txt")
         self.get_movies()
 
     def delete_entry(self, num):
@@ -46,10 +54,6 @@ class MovieList:
         with open(file="movies.txt", mode="w") as file:
             for movie in self.list:
                 file.writelines(movie)
-        for each in self.movie_objects:
-            each.grid_forget()
-        for each in self.button_objects:
-            each.grid_forget()
         self.display_movies()
 
     def get_movies(self):
@@ -79,8 +83,12 @@ class MovieList:
             self.display_movies()
 
     def display_movies(self):
-        """Create labels and buttons for each movie in the movie list, maximum 15 entries per column. Add these to
-         corresponding movie and button lists for easy deletion."""
+        """Removes previous button and labels(if they exist). Create labels & buttons for each movie in the movie list,
+         maximum 15 entries per column. Add these to corresponding movie and button lists for easy deletion."""
+        for each in self.movie_objects:
+            each.grid_forget()
+        for each in self.button_objects:
+            each.grid_forget()
         self.header.config(text=f"Movies to Watch: {len(self.list)}")
         count = 1
         column = 2
